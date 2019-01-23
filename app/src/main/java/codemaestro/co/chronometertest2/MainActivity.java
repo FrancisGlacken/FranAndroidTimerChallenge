@@ -13,13 +13,11 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private TextView timerView;
-    private boolean timerRunning;
-    private CountDownTimer timerValue;
-    private long startTime, currentTime, timeAfterLife;
     private Button startButton, pauseButton, resetButton, commitButton;
-    FormatTimer format = new FormatTimer();
-
-
+    private CountDownTimer timerValue;
+    private long startTime, displayTime, currentTime, timeAfterLife;
+    private boolean timerRunning;
+    private FormatTimer format = new FormatTimer();
     private static final String PREFS_FILE = "SharedPreferences";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
 
@@ -29,42 +27,46 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final SharedPreferences prefs = getSharedPreferences(PREFS_FILE, PREFS_MODE);
+        // Create sharedPrefs reference and get values
+        SharedPreferences prefs = getSharedPreferences(PREFS_FILE, PREFS_MODE);
+        timeAfterLife = prefs.getLong("time_after_life", 0);
+        currentTime = prefs.getLong("current_time", 0);
+        timerRunning = prefs.getBoolean("timer_running_boolean", false);
 
+        // View references
         startButton = findViewById(R.id.start_button);
         pauseButton = findViewById(R.id.pause_button);
         resetButton = findViewById(R.id.reset_button);
         commitButton = findViewById(R.id.commit_button);
         timerView = findViewById(R.id.timerView);
 
-        timeAfterLife = prefs.getLong("time_after_life", 0);
-        currentTime = prefs.getLong("current_time", 0);
-        timerRunning = prefs.getBoolean("timer_running_boolean", false);
+        // Set the clock to the saved time
+        setClock(currentTime);
 
-        setClock();
+        if(timerRunning) { // If timer was running, restart it with the correct values
 
-
-
-        if(timerRunning) {
-
+            // Get the time that the app was destroyed for
             timeAfterLife = SystemClock.elapsedRealtime() - timeAfterLife;
+
+            // Set the startTime to the adjusted time and start the timer
             startTime = SystemClock.elapsedRealtime() - currentTime - timeAfterLife;
-
             startTimer();
-            startButton.setEnabled(false);
-            resetButton.setEnabled(false);
-        } else {
-            pauseButton.setEnabled(false);
-            resetButton.setEnabled(false);
-            commitButton.setEnabled(false);
-        }
+            StartEnabledButtons();
 
+        } else { // If timer was not running, set the timerView and enable the right buttons
+            setClock(currentTime);
+            if(currentTime > 0){
+                PauseEnabledButtons();;
+            } else {
+                DefaultEnabledButtons();
+            }
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
+        currentTime = displayTime;
         timeAfterLife = SystemClock.elapsedRealtime();
         saveToSharedPreferences();
     }
@@ -72,16 +74,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        currentTime = displayTime;
         timeAfterLife = SystemClock.elapsedRealtime();
         saveToSharedPreferences();
     }
+
+    /**
+     * Timer Logic
+     */
 
     public void startTimer() {
         timerValue = new CountDownTimer(86400000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                currentTime = SystemClock.elapsedRealtime() - startTime;
-                setClock();
+                displayTime = currentTime + SystemClock.elapsedRealtime() - startTime;
+                if (currentTime > 0) { currentTime = 0; }
+                setClock(displayTime);
             }
             @Override
             public void onFinish() {
@@ -90,38 +98,70 @@ public class MainActivity extends AppCompatActivity {
         }.start();
     }
 
-    public void Start(View view) {
+    public void startButton(View view) {
+        // Get the startTime and start the timer
         startTime = SystemClock.elapsedRealtime();
         startTimer();
-        pauseButton.setEnabled(true);
-        startButton.setEnabled(false);
-        resetButton.setEnabled(false);
-        resetButton.setEnabled(false);
+        StartEnabledButtons();
         timerRunning = true;
     }
 
     public void pauseButton(View view) {
+        // Get the currentTime and cancel the timer
+        currentTime = displayTime;
         timerValue.cancel();
-        pauseButton.setEnabled(false);
-        startButton.setEnabled(true);
-        resetButton.setEnabled(true);
-        commitButton.setEnabled(true);
+        PauseEnabledButtons();
         timerRunning = false;
-        setClock();
     }
 
     public void resetButton(View view) {
-        setClock();
+        // Reset timer
+        currentTime = 0;
+        displayTime = 0;
+        setClock(0);
+        DefaultEnabledButtons();
+    }
 
+    public void commitButton(View view) {
+        Toast.makeText(this, "This is the same as a reset button but with a toast!", Toast.LENGTH_SHORT).show();
+        // Reset timer
+        currentTime = 0;
+        displayTime = 0;
+        setClock(0);
+        DefaultEnabledButtons();
+    }
+
+    /**
+     * SetEnabled Button Methods - Three states of buttons
+     */
+
+    public void StartEnabledButtons() {
+        // timer Started
+        startButton.setEnabled(false);
+        pauseButton.setEnabled(true);
         resetButton.setEnabled(false);
         commitButton.setEnabled(false);
     }
 
-    public void commitButton(View view) {
-        saveToSharedPreferences();
+    public void PauseEnabledButtons() {
+        // timer Paused
+        startButton.setEnabled(true);
+        pauseButton.setEnabled(false);
+        resetButton.setEnabled(true);
+        commitButton.setEnabled(true);
+    }
+
+    public void DefaultEnabledButtons() {
+        // timer Reset
+        startButton.setEnabled(true);
+        pauseButton.setEnabled(false);
+        resetButton.setEnabled(false);
         commitButton.setEnabled(false);
     }
 
+    /**
+     * Shared Preferences method
+     */
     public void saveToSharedPreferences() {
         SharedPreferences prefs = getSharedPreferences(PREFS_FILE, PREFS_MODE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -131,7 +171,10 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    public void setClock() {
-        timerView.setText(format.FormatMillisIntoHMS(currentTime));
+    /**
+     * setClock Method
+     */
+    public void setClock(long displayTime) {
+        timerView.setText(format.FormatMillisIntoHMS(displayTime));
     }
 }
