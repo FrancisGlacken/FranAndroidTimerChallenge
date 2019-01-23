@@ -14,26 +14,14 @@
         android:gravity="center">
 
         <TextView
-            android:id="@+id/timer_hour"
+            android:id="@+id/timerView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/timer_all_zereos"
             android:textAlignment="center"
             android:textSize="40sp" />
-        <TextView
-            android:id="@+id/timer_minute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/timer_all_zereos"
-            android:textAlignment="center"
-            android:textSize="40sp" />
-        <TextView
-            android:id="@+id/timer_second"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/timer_all_zereos"
-            android:textAlignment="center"
-            android:textSize="40sp" />
+
+
     </LinearLayout>
 
 

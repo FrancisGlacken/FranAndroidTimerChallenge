@@ -11,14 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.Format;
+
 public class MainActivity extends AppCompatActivity {
     private CustomChronometer customChronometer;
-    private TextView timerSecond, timerMinute, timerHour;
+    private TextView timerView;
     private boolean timerRunning;
     private CountDownTimer timerValue;
-    private int second, min, hour;
+    private int seconds;
     private Button startButton, pauseButton, resetButton, commitButton;
-
+    FormatTimer format = new FormatTimer();
 
     private static final String PREFS_FILE = "SharedPreferences";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
@@ -34,14 +36,9 @@ public class MainActivity extends AppCompatActivity {
         pauseButton = findViewById(R.id.pause_button);
         resetButton = findViewById(R.id.reset_button);
         commitButton = findViewById(R.id.commit_button);
+        timerView = findViewById(R.id.timerView);
 
-        timerSecond = findViewById(R.id.timer_second);
-        timerMinute = findViewById(R.id.timer_minute);
-        timerHour = findViewById(R.id.timer_hour);
-
-        second = prefs.getInt("Seconds", 0);
-        min = prefs.getInt("Minutes", 0);
-        hour = prefs.getInt("Hours", 0);
+        seconds = prefs.getInt("seconds", 0);
         timerRunning = prefs.getBoolean("Timer Running Boolean", false);
 
         setClock();
@@ -71,18 +68,7 @@ public class MainActivity extends AppCompatActivity {
         timerValue = new CountDownTimer(86400000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                second++;
-                if(second == 59) {
-                    min++;
-                    second = 0;
-                }
-                if(min == 59) {
-                    min = 0;
-                    hour++;
-                }
-                if(hour == 23) {
-                    hour = 0;
-                }
+                seconds++;
                 setClock();
             }
             @Override
@@ -112,9 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetButton(View view) {
-        second = 0;
-        min = 0;
-        hour = 0;
+        seconds = 0;
         setClock();
 
         resetButton.setEnabled(false);
@@ -129,16 +113,12 @@ public class MainActivity extends AppCompatActivity {
     public void saveToSharedPreferences() {
         SharedPreferences prefs = getSharedPreferences(PREFS_FILE, PREFS_MODE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt("Seconds", second);
-        editor.putInt("Minutes", min);
-        editor.putInt("Hours", hour);
+        editor.putInt("seconds", seconds);
         editor.putBoolean("Timer Running Boolean", timerRunning);
         editor.apply();
     }
 
     public void setClock() {
-        timerSecond.setText(String.valueOf(second));
-        timerMinute.setText(String.valueOf(min));
-        timerHour.setText(String.valueOf(hour));
+        timerView.setText(format.FormatSeconds(seconds));
     }
 }
