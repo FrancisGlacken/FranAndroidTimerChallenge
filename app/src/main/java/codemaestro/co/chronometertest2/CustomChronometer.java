@@ -1,7 +1,6 @@
-package codemaestro.co.chronometertest;
+package codemaestro.co.chronometertest2;
 
 import android.content.Context;
-import android.os.SystemClock;
 import android.widget.Chronometer;
 
 public class CustomChronometer extends Chronometer implements Chronometer.OnChronometerTickListener {

@@ -1,4 +1,4 @@
-package codemaestro.co.chronometertest;
+package codemaestro.co.chronometertest2;
 
 import org.junit.Test;
 

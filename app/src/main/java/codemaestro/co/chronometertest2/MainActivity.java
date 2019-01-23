@@ -1,4 +1,4 @@
-package codemaestro.co.chronometertest;
+package codemaestro.co.chronometertest2;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,16 +11,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.Format;
-
 public class MainActivity extends AppCompatActivity {
-    private CustomChronometer customChronometer;
     private TextView timerView;
     private boolean timerRunning;
     private CountDownTimer timerValue;
-    private int seconds;
+    private long startTime, currentTime, timeAfterLife;
     private Button startButton, pauseButton, resetButton, commitButton;
     FormatTimer format = new FormatTimer();
+
 
     private static final String PREFS_FILE = "SharedPreferences";
     private static final int PREFS_MODE = Context.MODE_PRIVATE;
@@ -30,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         final SharedPreferences prefs = getSharedPreferences(PREFS_FILE, PREFS_MODE);
 
         startButton = findViewById(R.id.start_button);
@@ -38,29 +37,42 @@ public class MainActivity extends AppCompatActivity {
         commitButton = findViewById(R.id.commit_button);
         timerView = findViewById(R.id.timerView);
 
-        seconds = prefs.getInt("seconds", 0);
-        timerRunning = prefs.getBoolean("Timer Running Boolean", false);
+        timeAfterLife = prefs.getLong("time_after_life", 0);
+        currentTime = prefs.getLong("current_time", 0);
+        timerRunning = prefs.getBoolean("timer_running_boolean", false);
 
         setClock();
 
+
+
         if(timerRunning) {
+
+            timeAfterLife = SystemClock.elapsedRealtime() - timeAfterLife;
+            startTime = SystemClock.elapsedRealtime() - currentTime - timeAfterLife;
+
             startTimer();
             startButton.setEnabled(false);
             resetButton.setEnabled(false);
         } else {
             pauseButton.setEnabled(false);
+            resetButton.setEnabled(false);
+            commitButton.setEnabled(false);
         }
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+
+        timeAfterLife = SystemClock.elapsedRealtime();
         saveToSharedPreferences();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        timeAfterLife = SystemClock.elapsedRealtime();
         saveToSharedPreferences();
     }
 
@@ -68,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         timerValue = new CountDownTimer(86400000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                seconds++;
+                currentTime = SystemClock.elapsedRealtime() - startTime;
                 setClock();
             }
             @Override
@@ -79,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void Start(View view) {
+        startTime = SystemClock.elapsedRealtime();
         startTimer();
         pauseButton.setEnabled(true);
         startButton.setEnabled(false);
@@ -98,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetButton(View view) {
-        seconds = 0;
         setClock();
 
         resetButton.setEnabled(false);
@@ -113,12 +125,13 @@ public class MainActivity extends AppCompatActivity {
     public void saveToSharedPreferences() {
         SharedPreferences prefs = getSharedPreferences(PREFS_FILE, PREFS_MODE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt("seconds", seconds);
-        editor.putBoolean("Timer Running Boolean", timerRunning);
+        editor.putLong("current_time", currentTime);
+        editor.putLong("time_after_life", timeAfterLife);
+        editor.putBoolean("timer_running_boolean", timerRunning);
         editor.apply();
     }
 
     public void setClock() {
-        timerView.setText(format.FormatSeconds(seconds));
+        timerView.setText(format.FormatMillisIntoHMS(currentTime));
     }
 }
