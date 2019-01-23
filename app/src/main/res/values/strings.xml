@@ -8,4 +8,9 @@
     <string name="reset_button_text">Reset</string>
     <string name="commit_button_text">Commit</string>
     <string name="colon">:</string>
+    <string name="starttime">startTime:</string>
+    <string name="currenttime">currentTime:</string>
+    <string name="displaytime">displayTime:</string>
+    <string name="timeafterlife">timeAfterLife:</string>
+    <string name="timerrunning">timerRunning:</string>
 </resources>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/timer_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/timerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/timer_all_zereos"
+            android:textAlignment="center"
+            android:textSize="40sp" />
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/LinearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/timer_container">
+
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startButton"
+            android:text="@string/start_button_text"
+            app:layout_constraintTop_toBottomOf="@+id/timer_container" />
+
+        <Button
+            android:id="@+id/pause_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="pauseButton"
+            android:text="@string/pause_button_text"
+            app:layout_constraintTop_toBottomOf="@+id/start_button" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LinearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/LinearLayout1">
+
+        <Button
+            android:id="@+id/reset_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="resetButton"
+            android:text="@string/reset_button_text"
+            app:layout_constraintTop_toBottomOf="@+id/pause_button" />
+
+        <Button
+            android:id="@+id/commit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="commitButton"
+            android:text="@string/commit_button_text"
+            app:layout_constraintTop_toBottomOf="@+id/reset_button" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/View1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/starttime"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/LinearLayout2" />
+
+    <TextView
+        android:id="@+id/View2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/currenttime"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/View1" />
+
+    <TextView
+        android:id="@+id/View3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/displaytime"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/View2" />
+
+    <TextView
+        android:id="@+id/View4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/timeafterlife"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/View3" />
+
+    <TextView
+        android:id="@+id/View5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/timerrunning"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/View4" />
+
+</android.support.constraint.ConstraintLayout>
